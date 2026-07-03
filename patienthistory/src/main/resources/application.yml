@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: patienthistory
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/patient_db
+
+server.port : 8082
