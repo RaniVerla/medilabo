@@ -1,28 +1,75 @@
-import axios from 'axios'
-import { useEffect, useState } from 'react'
-import './App.css'
+import { useEffect, useState } from "react";
+import axios from "axios";
+import api from "./api/api";
+import type { Patient } from "./models/Patient";
 
 function App() {
-  const [count, setCount] = useState(0)
-  //  {/* TODO : Get the patients in the backend  */}
+
+  const [patients, setPatients] = useState<Patient[]>([]);
+
   useEffect(() => {
-    const fetchTodos = async () => {
+
+    const loadPatients = async () => {
+
       try {
-        const response = await axios.get(`http://localhost:8081/api/v1/patients`);
-        // const response = { data: [{ "firstName": "Patient 1" }] };
-        console.log(response.data);
+
+        // Step 1: Get JWT from Gateway
+        const tokenResponse = await axios.get("http://localhost:8080/token");
+        const token = tokenResponse.data;
+
+        console.log("JWT Token:", token);
+
+        // Step 2: Call secured endpoint with JWT
+        const response = await api.get<Patient[]>("/patients", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        setPatients(response.data);
+
       } catch (error) {
-        console.error('Error fetching todos:', error);
+        console.error("Error fetching patients:", error);
       }
     };
-    fetchTodos();
-  }, []);
-  return (
-    <>
 
-      {/* TODO : Display patients in table using array map funtion */}
-    </>
-  )
+    loadPatients();
+
+  }, []);
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <h2>Patients</h2>
+
+      <table border={1} cellPadding={10}>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Date of Birth</th>
+            <th>Gender</th>
+            <th>Address</th>
+            <th>Phone</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {patients.map((patient) => (
+            <tr key={patient.id}>
+              <td>{patient.id}</td>
+              <td>{patient.firstName}</td>
+              <td>{patient.lastName}</td>
+              <td>{patient.dateOfBirth}</td>
+              <td>{patient.gender}</td>
+              <td>{patient.address}</td>
+              <td>{patient.phone}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
-export default App
+export default App;

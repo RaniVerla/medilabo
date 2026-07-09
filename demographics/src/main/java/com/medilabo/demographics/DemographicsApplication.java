@@ -9,14 +9,6 @@ public class DemographicsApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(DemographicsApplication.class, args);
 
-		/*● Last name
-		● First name
-		● Date of birth
-		● Gender
-		● Address
-		● Phone
-		*/
-
 	}
 
 }
