@@ -13,18 +13,8 @@ function App() {
 
       try {
 
-        // Step 1: Get JWT from Gateway
-        const tokenResponse = await axios.get("http://localhost:8080/token");
-        const token = tokenResponse.data;
-
-        console.log("JWT Token:", token);
-
         // Step 2: Call secured endpoint with JWT
-        const response = await api.get<Patient[]>("/patients", {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const response = await api.get<Patient[]>("/patients");
 
         setPatients(response.data);
 

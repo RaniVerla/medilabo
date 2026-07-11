@@ -1,6 +1,6 @@
 package com.medilabo.gateway.controller;
 
-import com.medilabo.gateway.util.JwtGenerator;
+import com.medilabo.gateway.config.JwtGenerator;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 

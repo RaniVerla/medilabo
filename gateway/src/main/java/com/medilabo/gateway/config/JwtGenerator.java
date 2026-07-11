@@ -1,7 +1,6 @@
-package com.medilabo.gateway.util;
+package com.medilabo.gateway.config;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
