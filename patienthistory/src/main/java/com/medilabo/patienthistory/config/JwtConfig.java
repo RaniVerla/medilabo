@@ -1,4 +1,4 @@
-package com.medilabo.demographics.config;
+package com.medilabo.patienthistory.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
