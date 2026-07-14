@@ -1,0 +1,15 @@
+package com.medilabo.assessment;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@Disabled
+@SpringBootTest
+class AssessmentApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}

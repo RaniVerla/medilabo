@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: assessment
+
+
+server.port : 8083
+
+services:
+  demographics:
+    url: http://localhost:8081
+
+  history:
+    url: http://localhost:8082
