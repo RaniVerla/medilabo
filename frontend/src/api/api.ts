@@ -1,28 +1,51 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: "http://localhost:8080/api/v1",
+    baseURL: "http://localhost:8080",
     headers: {
         "Content-Type": "application/json"
     }
 });
 
+// Request Interceptor
+// Adds JWT token to every request
 api.interceptors.request.use(
-  (config) => {
-    // Retrieve the token from wherever you store it (localStorage, state, etc.)
-    const token = localStorage.getItem('authToken'); 
+    (config) => {
 
-    // If the token exists, inject it into the Authorization header
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+        const token = localStorage.getItem("authToken");
+
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
     }
-    
-    return config;
-  },
-  (error) => {
-    // Handle request errors
-    return Promise.reject(error);
-  }
+);
+
+// Response Interceptor
+// If token is expired or invalid, logout automatically
+api.interceptors.response.use(
+    (response) => {
+        return response;
+    },
+    (error) => {
+
+        if (error.response?.status === 401) {
+
+            console.log("Session expired. Redirecting to Login...");
+
+            // Remove expired token
+            localStorage.removeItem("authToken");
+
+            // Redirect to Login page
+            window.location.href = "/";
+        }
+
+        return Promise.reject(error);
+    }
 );
 
 export default api;

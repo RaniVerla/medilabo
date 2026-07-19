@@ -11,17 +11,22 @@ public class JwtGenerator {
 
     private final SecretKey secretKey;
 
+
     public JwtGenerator(SecretKey secretKey) {
         this.secretKey = secretKey;
     }
 
-    public String generateToken() {
+
+    public String generateToken(String username) {
 
         return Jwts.builder()
-                .subject("test-user")
+                .subject(username)
                 .issuedAt(new Date())
                 .expiration(
-                        new Date(System.currentTimeMillis() + 60 * 60 * 1000)
+                        new Date(
+                                System.currentTimeMillis()
+                                        + 60 * 60 * 1000
+                        )
                 )
                 .signWith(secretKey)
                 .compact();

@@ -4,12 +4,18 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.ReactiveAuthenticationManager;
+import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
 import java.util.List;
@@ -58,7 +64,9 @@ public class SecurityConfig {
                 .cors(withDefaults())
                 .authorizeExchange(exchange ->
                         exchange
-                                .pathMatchers("/token")
+                                .pathMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**")
+                                .permitAll()
+                                .pathMatchers("/login")
                                 .permitAll()
                                 .anyExchange()
                                 .authenticated()
@@ -67,5 +75,34 @@ public class SecurityConfig {
                         oauth2.jwt(withDefaults())
                 )
                 .build();
+    }
+
+    @Bean
+    public ReactiveUserDetailsService userDetailsService() {
+
+        UserDetails user =
+                User.withUsername("user123")
+                        .password("{noop}password123")
+                        .roles("USER")
+                        .build();
+
+
+        return username ->
+                Mono.just(user)
+                        .filter(u -> u.getUsername().equals(username));
+    }
+
+    @Bean
+    public ReactiveAuthenticationManager authenticationManager(
+            ReactiveUserDetailsService userDetailsService) {
+
+
+        UserDetailsRepositoryReactiveAuthenticationManager manager =
+                new UserDetailsRepositoryReactiveAuthenticationManager(
+                        userDetailsService
+                );
+
+
+        return manager;
     }
 }

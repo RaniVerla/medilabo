@@ -31,7 +31,7 @@ public class RiskCalculator {
 
         for (HistoryNote note : notes) {
 
-            String text = note.getNotes().toLowerCase();
+            String text = note.getNote().toLowerCase();
 
             for (String trigger : TERMS) {
 

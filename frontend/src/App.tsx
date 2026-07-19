@@ -1,65 +1,37 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import api from "./api/api";
-import type { Patient } from "./models/Patient";
+import { useState } from "react";
+import Login from "./pages/Login";
+import Patients from "./pages/Patients";
+
 
 function App() {
 
-  const [patients, setPatients] = useState<Patient[]>([]);
+    const [isLoggedIn, setIsLoggedIn] = useState(
+    !!localStorage.getItem("authToken"));
 
-  useEffect(() => {
 
-    const loadPatients = async () => {
+    const handleLoginSuccess = () => {
 
-      try {
+        setIsLoggedIn(true);
 
-        // Step 2: Call secured endpoint with JWT
-        const response = await api.get<Patient[]>("/patients");
-
-        setPatients(response.data);
-
-      } catch (error) {
-        console.error("Error fetching patients:", error);
-      }
     };
 
-    loadPatients();
 
-  }, []);
+    if (!isLoggedIn) {
 
-  return (
-    <div style={{ padding: "20px" }}>
-      <h2>Patients</h2>
+        return (
+            <Login
+                onLoginSuccess={handleLoginSuccess}
+            />
+        );
 
-      <table border={1} cellPadding={10}>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Date of Birth</th>
-            <th>Gender</th>
-            <th>Address</th>
-            <th>Phone</th>
-          </tr>
-        </thead>
+    }
 
-        <tbody>
-          {patients.map((patient) => (
-            <tr key={patient.id}>
-              <td>{patient.id}</td>
-              <td>{patient.firstName}</td>
-              <td>{patient.lastName}</td>
-              <td>{patient.dateOfBirth}</td>
-              <td>{patient.gender}</td>
-              <td>{patient.address}</td>
-              <td>{patient.phone}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+
+    return (
+        <Patients />
+    );
+
 }
+
 
 export default App;

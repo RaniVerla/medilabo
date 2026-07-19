@@ -15,6 +15,6 @@ public class TokenController {
 
     @GetMapping("/token")
     public String token() {
-        return jwtGenerator.generateToken();
+        return jwtGenerator.generateToken("test-user");
     }
 }
