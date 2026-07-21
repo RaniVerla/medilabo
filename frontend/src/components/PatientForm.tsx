@@ -23,6 +23,8 @@ export default function PatientForm({
     const [address, setAddress] = useState("");
     const [phone, setPhone] = useState("");
 
+    const [errors, setErrors] = useState<Record<string, string>>({});
+
     useEffect(() => {
 
         if (patient) {
@@ -36,7 +38,48 @@ export default function PatientForm({
 
     }, [patient]);
 
+    const validate = () => {
+
+        const validationErrors: Record<string, string> = {};
+
+        if (!firstName.trim()) {
+            validationErrors.firstName = "First Name is required";
+        }
+
+        if (!lastName.trim()) {
+            validationErrors.lastName = "Last Name is required";
+        }
+
+        if (!dateOfBirth) {
+            validationErrors.dateOfBirth = "Date of Birth is required";
+        } else if (new Date(dateOfBirth) > new Date()) {
+            validationErrors.dateOfBirth = "Date of Birth cannot be in the future";
+        }
+
+        if (!gender.trim()) {
+            validationErrors.gender = "Gender is required";
+        }
+
+        if (!address.trim()) {
+            validationErrors.address = "Address is required";
+        }
+
+        if (!phone.trim()) {
+            validationErrors.phone = "Phone Number is required";
+        } else if (!/^\d{10}$/.test(phone)) {
+            validationErrors.phone = "Phone Number must be exactly 10 digits";
+        }
+
+        setErrors(validationErrors);
+
+        return Object.keys(validationErrors).length === 0;
+    };
+
     const savePatient = async () => {
+
+        if (!validate()) {
+            return;
+        }
 
         const request = {
             firstName,
@@ -71,10 +114,15 @@ export default function PatientForm({
 
             onSuccess();
 
-        } catch (error) {
+        } catch (error: any) {
 
             console.error(error);
-            alert("Operation failed.");
+
+            if (error.response?.data?.message) {
+                alert(error.response.data.message);
+            } else {
+                alert("Operation failed.");
+            }
 
         }
 
@@ -99,7 +147,13 @@ export default function PatientForm({
                 placeholder="First Name"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
+                style={{ width: "100%" }}
             />
+            {errors.firstName && (
+                <div style={{ color: "red", fontSize: "12px" }}>
+                    {errors.firstName}
+                </div>
+            )}
 
             <br /><br />
 
@@ -107,7 +161,13 @@ export default function PatientForm({
                 placeholder="Last Name"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
+                style={{ width: "100%" }}
             />
+            {errors.lastName && (
+                <div style={{ color: "red", fontSize: "12px" }}>
+                    {errors.lastName}
+                </div>
+            )}
 
             <br /><br />
 
@@ -115,31 +175,63 @@ export default function PatientForm({
                 type="date"
                 value={dateOfBirth}
                 onChange={(e) => setDateOfBirth(e.target.value)}
+                style={{ width: "100%" }}
             />
+            {errors.dateOfBirth && (
+                <div style={{ color: "red", fontSize: "12px" }}>
+                    {errors.dateOfBirth}
+                </div>
+            )}
 
             <br /><br />
 
-            <input
-                placeholder="Gender"
+            <select
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
-            />
+                style={{ width: "100%" }}
+            >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+
+            {errors.gender && (
+                <div style={{ color: "red", fontSize: "12px" }}>
+                    {errors.gender}
+                </div>
+            )}
 
             <br /><br />
 
             <input
                 placeholder="Address"
                 value={address}
+                maxLength={200}
                 onChange={(e) => setAddress(e.target.value)}
+                style={{ width: "100%" }}
             />
+            {errors.address && (
+                <div style={{ color: "red", fontSize: "12px" }}>
+                    {errors.address}
+                </div>
+            )}
 
             <br /><br />
 
             <input
                 placeholder="Phone"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                maxLength={10}
+                onChange={(e) =>
+                    setPhone(e.target.value.replace(/\D/g, ""))
+                }
+                style={{ width: "100%" }}
             />
+            {errors.phone && (
+                <div style={{ color: "red", fontSize: "12px" }}>
+                    {errors.phone}
+                </div>
+            )}
 
             <br /><br />
 

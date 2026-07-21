@@ -4,7 +4,7 @@ import type { Patient } from "../models/Patient";
 import PatientForm from "../components/PatientForm";
 import PatientDetails from "./PatientDetails";
 import PatientHistory from "./PatientHistory";
-
+import Assessment from "./Assessment";
 
 export default function Patients() {
 
@@ -18,6 +18,8 @@ export default function Patients() {
 
     const [historyPatientId, setHistoryPatientId] = useState<number | null>(null);
 
+    const [assessmentPatientId, setAssessmentPatientId] = useState<number | null>(null);
+
     const loadPatients = async () => {
 
         try {
@@ -28,9 +30,7 @@ export default function Patients() {
 
             setPatients(response.data);
 
-        }
-
-        catch (error) {
+        } catch (error) {
 
             console.error(error);
 
@@ -83,11 +83,8 @@ export default function Patients() {
         return (
 
             <PatientDetails
-
                 patientId={viewPatientId}
-
                 onBack={() => setViewPatientId(null)}
-
             />
 
         );
@@ -99,11 +96,21 @@ export default function Patients() {
         return (
 
             <PatientHistory
-
                 patientId={historyPatientId}
-
                 onBack={() => setHistoryPatientId(null)}
+            />
 
+        );
+
+    }
+
+    if (assessmentPatientId !== null) {
+
+        return (
+
+            <Assessment
+                patientId={assessmentPatientId}
+                onBack={() => setAssessmentPatientId(null)}
             />
 
         );
@@ -120,9 +127,7 @@ export default function Patients() {
 
                 <button
                     onClick={handleAdd}
-                    style={{
-                        marginBottom: "20px"
-                    }}
+                    style={{ marginBottom: "20px" }}
                 >
                     Add Patient
                 </button>
@@ -132,13 +137,9 @@ export default function Patients() {
             {showForm && (
 
                 <PatientForm
-
                     patient={selectedPatient}
-
                     onSuccess={handleSuccess}
-
                     onCancel={handleCancel}
-
                 />
 
             )}
@@ -213,6 +214,15 @@ export default function Patients() {
                                         style={{ marginLeft: "5px" }}
                                     >
                                         History
+                                    </button>
+
+                                    <button
+                                        onClick={() =>
+                                            setAssessmentPatientId(patient.id)
+                                        }
+                                        style={{ marginLeft: "5px" }}
+                                    >
+                                        Assessment
                                     </button>
 
                                 </td>

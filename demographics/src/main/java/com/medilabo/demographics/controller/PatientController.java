@@ -5,6 +5,7 @@ import com.medilabo.demographics.dto.request.PatientRequest;
 import com.medilabo.demographics.dto.response.PatientResponse;
 import com.medilabo.demographics.entity.Patient;
 import com.medilabo.demographics.service.PatientService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class PatientController {
     private final PatientService service;
 
     @PostMapping
-    public ResponseEntity<PatientResponse> addPatient(@RequestBody PatientRequest request) {
+    public ResponseEntity<PatientResponse> addPatient(@Valid  @RequestBody PatientRequest request) {
         return new ResponseEntity<>(service.addPatient(request), HttpStatus.CREATED);
     }
 
