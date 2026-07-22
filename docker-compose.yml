@@ -1,21 +1,50 @@
-version: '2'
-
 services:
-  app:
-    image: 'docker-spring-boot-postgres:latest'
+
+  demographics:
+    image: medilabo-demographics
     build:
       context: demographics
-    container_name: app
+    container_name: demographics
+    ports:
+      - "8081:8081"
     depends_on:
       - db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/compose-postgres
-      - SPRING_DATASOURCE_USERNAME=compose-postgres
-      - SPRING_DATASOURCE_PASSWORD=compose-postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/patientdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: admin
 
   db:
-    image: 'postgres:13.1-alpine'
-    container_name: db
+    image: postgres:16-alpine
+    container_name: postgres-db
+    ports:
+      - "5432:5432"
     environment:
-      - POSTGRES_USER=compose-postgres
-      - POSTGRES_PASSWORD=compose-postgres
+      POSTGRES_DB: patientdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  patienthistory:
+    image: medilabo-patienthistory
+    build:
+      context: patienthistory
+    container_name: patienthistory
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+
+volumes:
+  postgres-data:
+  mongodb-data:

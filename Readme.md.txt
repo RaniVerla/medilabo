@@ -1,10 +1,10 @@
 ✅Frontend:
 ✅ React screens for:
-Patient List
-Add/Edit Patient
-Patient Details
-Medical History
-Assessment Report
+    - Patient List
+    - Add/Edit Patient
+    - Patient Details
+    - Medical History
+    - Assessment Report
 ✅Backend
 ✅Spring Cloud Gateway
 ✅ JWT authentication

@@ -2,20 +2,16 @@ spring:
      application:
           name: DemographicsApplication
      datasource:
-         url: jdbc:postgresql://localhost:5432/patientdb
+         url: jdbc:postgresql://postgres:5432/patientdb
          username: postgres
          password: admin
      jpa:
        hibernate:
-         ddl-auto: none
+         ddl-auto: update
        properties:
          hibernate:
-           default_schema: patient
+           default_schema: public
        show-sql: true
-     liquibase:
-       enabled: true
-       change-log: classpath:liquibase/db.changelog-master.yaml
-       default-schema: patient
 
 
 server:
