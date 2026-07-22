@@ -1,5 +1,12 @@
 services:
 
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+#    depends_on:
+#      - backend
+
   demographics:
     image: medilabo-demographics
     build:
