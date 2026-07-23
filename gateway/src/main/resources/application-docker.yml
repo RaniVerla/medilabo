@@ -1,0 +1,21 @@
+spring:
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+
+            - id: demographics-service
+              uri: http://demographics:8081
+              predicates:
+                - Path=/api/v1/patients/**
+
+            - id: patient-history-service
+              uri: http://patienthistory:8082
+              predicates:
+                - Path=/api/v2/patients/**
+
+            - id: assessment-service
+              uri: http://assessment:8083
+              predicates:
+                - Path=/api/v3/assessments/**

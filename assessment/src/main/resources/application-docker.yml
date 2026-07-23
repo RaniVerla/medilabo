@@ -1,0 +1,9 @@
+server:
+  port: 8083
+
+services:
+  demographics:
+    url: http://demographics:8081
+
+  history:
+    url: http://patienthistory:8082

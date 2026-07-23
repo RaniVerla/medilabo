@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -27,82 +28,78 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
+
     @PostConstruct
     public void init() {
         log.info("******** CUSTOM SECURITY CONFIG LOADED ********");
     }
 
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // 1. Allow your specific React frontend origin
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
 
-        // 2. Allow standard HTTP methods
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // React origins
+        configuration.setAllowedOrigins(List.of("http://localhost", "http://localhost:5173"));
 
-        // 3. Allow standard and custom headers (like Authorization)
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
 
-        // 4. Allow credentials if you plan to use cookies or HTTP auth headers
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+
+
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept"));
+
+
+        // Needed if browser sends credentials
         configuration.setAllowCredentials(true);
 
+
+        // Allow frontend to read these response headers
+        configuration.setExposedHeaders(List.of("Authorization"));
+
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // Apply this configuration to all paths
+
         source.registerCorsConfiguration("/**", configuration);
+
+
         return source;
     }
+
 
     @Bean
     SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
 
         log.info("******** SECURITY FILTER CHAIN CREATED ********");
 
-        return http
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+
+        return http.csrf(ServerHttpSecurity.CsrfSpec::disable)
+
                 .cors(withDefaults())
-                .authorizeExchange(exchange ->
-                        exchange
-                                .pathMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**")
-                                .permitAll()
-                                .pathMatchers("/login")
-                                .permitAll()
-                                .anyExchange()
-                                .authenticated()
-                )
-                .oauth2ResourceServer(oauth2 ->
-                        oauth2.jwt(withDefaults())
-                )
+
+                .authorizeExchange(exchange -> exchange
+                        .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .pathMatchers("/login").permitAll()
+                        .pathMatchers("/actuator/**").permitAll()
+                        .anyExchange().authenticated())
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
                 .build();
     }
+
 
     @Bean
     public ReactiveUserDetailsService userDetailsService() {
 
-        UserDetails user =
-                User.withUsername("user123")
-                        .password("{noop}password123")
-                        .roles("USER")
-                        .build();
-
-
-        return username ->
-                Mono.just(user)
-                        .filter(u -> u.getUsername().equals(username));
+        UserDetails user = User.withUsername("user123").password("{noop}password123").roles("USER").build();
+        return username -> Mono.just(user).filter(u -> u.getUsername().equals(username));
     }
 
+
     @Bean
-    public ReactiveAuthenticationManager authenticationManager(
-            ReactiveUserDetailsService userDetailsService) {
+    public ReactiveAuthenticationManager authenticationManager(ReactiveUserDetailsService userDetailsService) {
 
 
-        UserDetailsRepositoryReactiveAuthenticationManager manager =
-                new UserDetailsRepositoryReactiveAuthenticationManager(
-                        userDetailsService
-                );
-
-
-        return manager;
+        return new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService);
     }
 }

@@ -1,11 +1,14 @@
 services:
 
   frontend:
-    build: ./frontend
+    image: medilabo-frontend
+    build:
+      context: frontend
     ports:
       - "80:80"
-#    depends_on:
-#      - backend
+    depends_on:
+      - gateway
+
 
   demographics:
     image: medilabo-demographics
@@ -21,6 +24,7 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: admin
 
+
   db:
     image: postgres:16-alpine
     container_name: postgres-db
@@ -34,6 +38,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
+
   patienthistory:
     image: medilabo-patienthistory
     build:
@@ -44,6 +49,7 @@ services:
     depends_on:
       - mongodb
 
+
   mongodb:
     image: mongo:7
     container_name: mongodb
@@ -51,6 +57,36 @@ services:
       - "27017:27017"
     volumes:
       - mongodb-data:/data/db
+
+
+  assessment:
+    image: medilabo-assessment
+    build:
+      context: assessment
+    container_name: assessment
+    ports:
+      - "8083:8083"
+    depends_on:
+      - demographics
+      - patienthistory
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+
+
+  gateway:
+    image: medilabo-gateway
+    build:
+      context: gateway
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - demographics
+      - patienthistory
+      - assessment
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+
 
 volumes:
   postgres-data:
